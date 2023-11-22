@@ -1,27 +1,46 @@
 import OpenAI from "openai";
-
+import fs from "fs";
 const secretKey = process.env.OPENAI_API_KEY;
 
-const openai = new OpenAI({
+export const openai = new OpenAI({
   apiKey: secretKey,
 });
 
-let assistantInstance: any = null;
+// Database for storing assistant ID.
+const assistantIdFilePath = "assistantId.txt";
 
-async function createAssistant() {
-  if (!assistantInstance) {
-    assistantInstance = await openai.beta.assistants.create({
-      instructions:
-        "You are a personal math tutor. When asked a question, write and run Python code to answer the question.",
-      name: "Math Tutor",
-      tools: [{ type: "code_interpreter" }],
-      model: "gpt-4",
-    });
+export const createAssistant = async () => {
+  // Try to read the assistant ID from the file
+  let assistantId;
+  try {
+    assistantId = fs.readFileSync(assistantIdFilePath, "utf8");
+  } catch (error) {
+    console.log("Assistant ID file not found, creating a new assistant");
   }
-  return assistantInstance;
-}
 
-export const main = async (threadId: string | undefined, question: string) => {
+  if (!assistantId) {
+    const assistantInstance = await openai.beta.assistants.create({
+      instructions:
+        "You are customer support agent trying to help the customer",
+      name: "Customer Support Bot",
+      tools: [{ type: "retrieval" }],
+      model: "gpt-3.5-turbo-1106",
+    });
+
+    // Save the assistant ID to a file
+    fs.writeFileSync(assistantIdFilePath, assistantInstance.id);
+
+    return assistantInstance;
+  } else {
+    // If the assistant ID is already stored, return the ID
+    return { id: assistantId };
+  }
+};
+
+export const createThreadAndRun = async (
+  threadId: string | undefined,
+  question: string
+) => {
   const myAssistant = await createAssistant();
   const thread = await createThread(threadId);
   await addMessageToThread(thread.id, question);
@@ -65,4 +84,11 @@ export const statusOfRun = async (threadId: string, runId: string) => {
 export const getMessagesForThread = async (threadId: string) => {
   const messages = await openai.beta.threads.messages.list(threadId);
   return messages;
+};
+
+export const uploadFile = async () => {
+  const file = await openai.files.create({
+    file: fs.createReadStream("mydata.jsonl"),
+    purpose: "fine-tune",
+  });
 };

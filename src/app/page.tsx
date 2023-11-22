@@ -1,58 +1,61 @@
 "use client";
-import ChatHeader from "./components/ChatHeader";
-import Messages from "./components/Messages";
-import InputArea from "./components/InputArea";
-import { useEffect, useState } from "react";
-import { useLocalStorage } from "usehooks-ts";
+import ChatHeader from "./_components/ChatHeader";
+import MessageWindows from "./_components/MessageWindow";
+import InputArea from "./_components/InputArea";
+import { useEffect } from "react";
+
 import { mutate } from "swr";
+import { useChatbotContext } from "./_contexts/ChatbotProvider";
 
 export default function Home() {
-  const [threadId, setThreadId] = useLocalStorage("threadId", undefined);
-  const [runId, setRunId] = useLocalStorage<string | undefined>(
-    "runId",
-    undefined
-  );
-  const [isLoading, setIsLoading] = useState(false);
+  const { runId, threadId, setIsLoading, isLoading, setRunId } =
+    useChatbotContext();
 
   useEffect(() => {
-    if (!runId) return;
+    if (!runId || !threadId) return;
 
     const checkStatus = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/status?threadId=${threadId}&runId=${runId}`
+          `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/status?threadId=${threadId}&runId=${runId}`
         );
         const { status } = await response.json();
-        setIsLoading(status);
+        setIsLoading(true);
 
         if (status === "completed") {
-          setIsLoading(status);
+          setIsLoading(false);
           await mutate(
-            `http://localhost:3000/api/messages?threadId=${threadId}`
+            `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/messages?threadId=${threadId}`
           );
+          setRunId(undefined);
           // You might want to do something once the run is completed.
         } else {
           // Recheck after a delay if not completed
-          setTimeout(checkStatus, 2000);
+          setTimeout(checkStatus, 1000);
         }
-      } catch (error) {
-        console.error("Error checking run status:", error);
-        // Handle error appropriately
-      }
+      } catch (error) {}
     };
 
     checkStatus();
-  }, [runId]);
+  }, [runId, threadId]);
 
   return (
     <main
-      id="chatbot"
+      id="chatbot-openai"
       className="w-screen h-screen bg-white shadow-lg rounded-lg overflow-hidden flex flex-col"
     >
-      is loading: {isLoading}
       <ChatHeader></ChatHeader>
-      <Messages></Messages>
+      <MessageWindows></MessageWindows>
+      {isLoading && <LoadingSpinner></LoadingSpinner>}
       <InputArea></InputArea>
     </main>
   );
 }
+
+const LoadingSpinner = () => {
+  return (
+    <div className="flex justify-center items-center">
+      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
+    </div>
+  );
+};
