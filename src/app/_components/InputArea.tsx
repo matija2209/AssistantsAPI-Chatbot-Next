@@ -30,7 +30,11 @@ function InputArea() {
           content: [{ text: { value: data.question } }],
           role: "user",
         };
-        return { ...currentData, data: [...currentData.data, newMessage] };
+
+        return {
+          ...currentData,
+          data: [...(currentData?.data ?? []), newMessage],
+        };
       },
       false
     );
