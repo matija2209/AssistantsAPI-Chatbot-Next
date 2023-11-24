@@ -1,10 +1,8 @@
 import axios from "axios";
 import React from "react";
 import { useForm } from "react-hook-form";
-
 import Link from "next/link";
 import { mutate } from "swr";
-import { ThreadMessagesPage } from "openai/resources/beta/threads/messages/messages.mjs";
 import { useChatbotContext } from "../_contexts/ChatbotProvider";
 
 interface FormFields {
@@ -38,7 +36,6 @@ function InputArea() {
     );
     setIsLoading(true);
     reset();
-    // await mutate()
 
     const config = {
       method: "POST",

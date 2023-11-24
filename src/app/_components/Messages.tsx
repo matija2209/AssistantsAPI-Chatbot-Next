@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import Message from "./Message";
 
 function Messages({ messages }: { messages: ThreadMessage[] }) {
-  const lastMessageRef = useRef(null);
+  const lastMessageRef = useRef<any>(null);
 
   // Scroll to the last message whenever the messages update
   useEffect(() => {

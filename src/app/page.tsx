@@ -42,7 +42,7 @@ export default function Home() {
   return (
     <main
       id="chatbot-openai"
-      className="w-screen h-screen bg-white shadow-lg rounded-lg overflow-hidden flex flex-col"
+      className="w-screen h-screen bg-white shadow-lg overflow-hidden flex flex-col"
     >
       <ChatHeader></ChatHeader>
       <MessageWindows></MessageWindows>

@@ -3,7 +3,7 @@ import React from "react";
 import { formatMessage } from "../_utils/formatMessage";
 
 const Message = React.forwardRef(
-  ({ message }: { message: ThreadMessage }, ref) => (
+  ({ message }: { message: ThreadMessage | any }, ref: any) => (
     <div
       ref={ref}
       className={`clear-both relative overflow-hidden ${

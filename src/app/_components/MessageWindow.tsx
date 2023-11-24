@@ -8,7 +8,7 @@ import { useChatbotContext } from "../_contexts/ChatbotProvider";
 
 function MessageWindows() {
   const { threadId } = useChatbotContext();
-  const { data: messages, error } = useSWR<ThreadMessagesPage>(() => {
+  const { data: messages, error } = useSWR<ThreadMessagesPage | any>(() => {
     if (threadId) {
       return `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/messages?threadId=${threadId}`;
     }
@@ -28,7 +28,7 @@ function MessageWindows() {
     );
 
   const sortedMessagesByDate = messages.data.sort(
-    (a, b) => a.created_at - b.created_at
+    (a: any, b: any) => a.created_at - b.created_at
   );
   return (
     <div className="flex-grow overflow-y-auto p-4">
