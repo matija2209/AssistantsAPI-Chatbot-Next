@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@vercel/postgres": "^0.5.1",
+    "@vercel/postgres-kysely": "^0.6.0",
     "axios": "^1.6.1",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",

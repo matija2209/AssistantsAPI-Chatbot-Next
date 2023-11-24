@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import fs from "fs";
+import { getAssistantId, updateAssistantId } from "./vercelPgsql";
 const secretKey = process.env.OPENAI_API_KEY;
 
 export const openai = new OpenAI({
@@ -7,13 +8,12 @@ export const openai = new OpenAI({
 });
 
 // Database for storing assistant ID.
-const assistantIdFilePath = "assistantId.txt";
 
 export const createAssistant = async () => {
   // Try to read the assistant ID from the file
   let assistantId;
   try {
-    assistantId = fs.readFileSync(assistantIdFilePath, "utf8");
+    assistantId = await getAssistantId();
   } catch (error) {
     console.log("Assistant ID file not found, creating a new assistant");
   }
@@ -28,7 +28,7 @@ export const createAssistant = async () => {
     });
 
     // Save the assistant ID to a file
-    fs.writeFileSync(assistantIdFilePath, assistantInstance.id);
+    await updateAssistantId(assistantInstance.id);
 
     return assistantInstance;
   } else {
